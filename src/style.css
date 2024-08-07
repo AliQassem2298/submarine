@@ -1,0 +1,122 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    overflow: hidden;
+}
+
+.webgl {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+.dialog {
+    display: none;
+    position: fixed;
+    /* top: 50%;
+    left: 50%; */
+
+    width: 100vw;
+    /* Full width of viewport */
+    height: 100vh;
+    /* Full height of viewport */
+    /* transform: translate(-50%, -50%); */
+    background-color: rgba(0, 0, 0, 0.8);
+    /* Semi-transparent black background */
+    padding: 200px 450px;
+    /* Adjust padding to increase/decrease dialog size */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    /* Ensure it is above other content */
+    max-width: 100%;
+    /* Limit the maximum width of the dialog */
+    justify-content: center;
+    align-items: center;
+}
+
+.dialog-content {
+    text-align: center;
+    background-color: white;
+    /* White background for the content */
+    padding: 40px;
+    /* Adjust padding to increase/decrease dialog size */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 40%;
+
+    /* Limit the maximum width of the dialog content */
+    border-radius: 10px;
+    /* Optional: Rounded corners for the dialog content */
+}
+
+.dialog-icon {
+    /* width: 150px; */
+    /* Adjust image width */
+    height: auto;
+    /* Maintain aspect ratio */
+    margin-bottom: 20px;
+}
+
+.dialog-message {
+    font-size: 24px;
+    font-weight: bold;
+    color: red;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.dialog button {
+
+    cursor: pointer;
+    margin-top: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    /* Optional: Rounded corners for the button */
+    font-size: 18px;
+}
+
+
+.dialog button:hover {
+    background-color: darkred;
+    /* Darker red when hovering over the button */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* body {
+    background-color: red;
+} */
+/* body {
+    margin: 0;
+    overflow: hidden;
+}
+
+#container {
+    width: 100vw;
+    height: 100vh;
+}
+     */

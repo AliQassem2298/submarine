@@ -1,0 +1,11 @@
+Model Information:
+* title:	USS Virginia SSN-774
+* source:	https://sketchfab.com/3d-models/uss-virginia-ssn-774-339f9731013e4b41b87557f261a9892f
+* author:	KoreanNavy (https://sketchfab.com/KoreanNavy)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "USS Virginia SSN-774" (https://sketchfab.com/3d-models/uss-virginia-ssn-774-339f9731013e4b41b87557f261a9892f) by KoreanNavy (https://sketchfab.com/KoreanNavy) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

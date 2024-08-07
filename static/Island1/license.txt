@@ -1,0 +1,11 @@
+Model Information:
+* title:	Hero Mountain
+* source:	https://sketchfab.com/3d-models/hero-mountain-83b3fd690ea44e988d086d5165a5f2ca
+* author:	solararchitect (https://sketchfab.com/solararchitect)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Hero Mountain" (https://sketchfab.com/3d-models/hero-mountain-83b3fd690ea44e988d086d5165a5f2ca) by solararchitect (https://sketchfab.com/solararchitect) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Grassy Mountains with Lakes
+* source:	https://sketchfab.com/3d-models/grassy-mountains-with-lakes-408364942d794699bbf99aaced81881d
+* author:	Šimon Ustal (https://sketchfab.com/simonustal)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Grassy Mountains with Lakes" (https://sketchfab.com/3d-models/grassy-mountains-with-lakes-408364942d794699bbf99aaced81881d) by Šimon Ustal (https://sketchfab.com/simonustal) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
