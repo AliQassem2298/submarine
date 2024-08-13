@@ -3,149 +3,136 @@ import * as THREE from "three";
 
 class Submarine {
     constructor() {
-        this.position = new Vector3();
-        this.velocity = new Vector3();
-        this.acceleration = new Vector3();
+        this.position = new Vector3(0, 0, 0); // Submarine's position
+        this.velocity = new Vector3(); // Submarine's velocity
+        this.acceleration = new Vector3(); // Submarine's acceleration
         this.mass = 7900000; // Mass of the submarine in kg
         this.volume = 7707.32; // Volume of the submarine in cubic meters
         this.density = 1025; // Density of water in kg/m^3
-        this.area = 121.35; // Total reference area in square meters
-        this.upperArea = 25; // Upper part reference area in square meters
-        this.lowerArea = 96.35; // Lower part reference area in square meters
         this.airDensity = 1.225; // Density of air in kg/m^3
         this.CdAir = 0.3; // Drag coefficient for air
         this.CdWater = 0.025; // Drag coefficient for water
+        this.area = 121.35; // Total reference area in square meters
+        this.upperArea = 25; // Upper part reference area in square meters
+        this.lowerArea = 96.35; // Lower part reference area in square meters
         this.maxEnginePower = 29828000; // Max power output in watts (40,000 shp)
         this.propellerEfficiency = 0.7; // Propeller efficiency (dimensionless)
         this.desiredSpeed = null; // Desired speed set by the captain
         this.desiredThrust = null; // Desired thrust set by the captain
         this.desiredDepth = 0; // Desired depth set by the captain in meters
-        this.ballastStatus = "empty"; // Ballast tank status
         this.ballastPercentage = 0; // Ballast tank fill percentage
         this.maxDepth = 490; // Maximum depth the submarine can reach with full ballast tanks
-        this.maxY = 2000; // Maximum Y position for rising
-        this.minY = -2000; // Minimum Y position for sinking
         this.currentDepth = 0; // Current depth of the submarine
+        this.timeStep = 1; // Time step in seconds for each update
+        this.guiControls = null;  // Placeholder for the GUIControls instance
+
     }
-
-    // update() {
-    //     // Update ballast tank status based on desired depth
-    //     this.updateBallastTank();
-
-    //     // Calculate the total force
-    //     const totalForce = this.totalForce();
-
-    //     // Calculate the linear acceleration
-    //     this.acceleration = totalForce.divideScalar(this.mass);
-
-    //     // Calculate the linear velocity
-    //     this.velocity = this.velocity.addVector(this.acceleration.clone().multiplyScalar(0.05)); // Faster movement
-    //     this.velocityLength = this.velocity.length();
-
-    //     // Calculate the position
-    //     this.position = this.position.addVector(this.velocity.clone().multiplyScalar(0.05)); // Faster movement
-
-    //     // Update current depth for GUI
-    //     this.currentDepth = Math.abs(this.position.y);
-
-    //     // Adjust position and velocity if near the desired depth to prevent overshooting
-    //     if (Math.abs(this.position.y + this.desiredDepth) < 0.1 && this.velocity.y !== 0) {
-    //         this.velocity.y = 0; // Stop vertical movement
-    //         this.position.y = -this.desiredDepth; // Snap to the desired depth
-    //     }
-
-    //     // If at the surface, reset ballast tanks to 0%
-    //     if (this.position.y >= 0) {
-    //         this.ballastPercentage = 0;
-    //         this.ballastStatus = "empty";
-    //         this.position.y = 0;
-    //     }
-    // }
-
-    // updateBallastTank() {
-    //     // Calculate the required ballast percentage to reach the desired depth
-    //     const targetPercentage = this.desiredDepth / this.maxDepth;
-
-    //     if (this.position.y > -this.desiredDepth) {
-    //         if (this.ballastPercentage < targetPercentage) {
-    //             this.ballastStatus = "filling";
-    //             this.ballastPercentage = Math.min(this.ballastPercentage + 0.03, targetPercentage); // Faster filling
-    //         } else {
-    //             this.ballastStatus = "filled with " + Math.round(this.ballastPercentage * 100) + "%";
-    //         }
-    //     } else if (this.position.y < -this.desiredDepth) {
-    //         if (this.ballastPercentage > targetPercentage) {
-    //             this.ballastStatus = "emptying";
-    //             this.ballastPercentage = Math.max(this.ballastPercentage - 0.03, targetPercentage); // Faster emptying
-    //         } else {
-    //             this.ballastStatus = "filled with " + Math.round(this.ballastPercentage * 100) + "%";
-    //         }
-    //     } else {
-    //         this.ballastStatus = "filled with " + Math.round(this.ballastPercentage * 100) + "%";
-    //     }
-    // }
+    setGUIControls(guiControls) {
+        this.guiControls = guiControls;
+    }
     update() {
         // Update ballast tank status based on desired depth
         this.updateBallastTank();
 
-        // Calculate the total force
+        // Calculate the total force acting on the submarine
         const totalForce = this.totalForce();
 
-        // Calculate the linear acceleration
+        // Update acceleration (Newton's 2nd Law: F = ma)
         this.acceleration = totalForce.divideScalar(this.mass);
 
-        // Calculate the linear velocity
-        this.velocity = this.velocity.addVector(this.acceleration.clone().multiplyScalar(0.02));
-        this.velocityLength = this.velocity.length();
+        // Update velocity based on acceleration
+        this.velocity = this.velocity.addVector(this.acceleration.clone().multiplyScalar(this.timeStep));
 
-        // Calculate the position
-        this.position = this.position.addVector(this.velocity.clone().multiplyScalar(0.02));
+        // Apply realistic ascent/descent rates
+        this.applyAscentDescentRates();
 
-        // Adjust position and velocity if near the desired depth to prevent overshooting
-        if (Math.abs(this.position.y + this.desiredDepth) < 0.1 && this.velocity.y !== 0) {
+        // Update position based on velocity
+        this.position = this.position.addVector(this.velocity.clone().multiplyScalar(this.timeStep));
+
+        // Update the current depth for GUI
+        this.currentDepth = Math.abs(this.position.y);
+
+        // Stop at desired depth
+        this.adjustForDesiredDepth();
+
+        // Calculate pressure at current depth
+        const pressure = this.calculatePressure();
+        console.log(`Pressure at depth ${this.currentDepth}: ${pressure} Pa`);
+        console.log(`Ballast Percentage: ${this.ballastPercentage * 100} %`);
+        // Call updateOverlay from the GUIControls instance
+        if (this.guiControls) {
+            this.guiControls.updateOverlay();
+        }
+
+    }
+
+    applyAscentDescentRates() {
+        // Adjust the vertical velocity based on the ascent/descent rates
+        const depthDifference = this.desiredDepth - this.currentDepth;
+
+        if (depthDifference > 0) {
+            // Descending
+            this.velocity.y = -Math.min(0.5, depthDifference / this.timeStep);
+        } else if (depthDifference < 0) {
+            // Ascending
+            this.velocity.y = Math.min(0.2, Math.abs(depthDifference) / this.timeStep);
+        } else {
+            // Stop vertical movement if at desired depth
+            this.velocity.y = 0;
+        }
+    }
+
+    adjustForDesiredDepth() {
+        // Prevent overshooting the desired depth
+        if (Math.abs(this.currentDepth - this.desiredDepth) < 0.1) {
             this.velocity.y = 0; // Stop vertical movement
             this.position.y = -this.desiredDepth; // Snap to the desired depth
+        }
+
+        // Prevent going below max depth
+        if (this.currentDepth >= this.maxDepth) {
+            this.velocity.y = 0;
+            this.position.y = -this.maxDepth;
+            this.ballastPercentage = 1.0; // Ballast tanks filled 100%
+        }
+
+        // Surface if desired depth is 0
+        if (this.desiredDepth === 0 && this.currentDepth < 0.1) {
+            this.ballastPercentage = 0;
+            this.position.y = 0; // Snap to surface
         }
     }
 
     updateBallastTank() {
-        // Calculate the required ballast percentage to reach the desired depth
-        const targetPercentage = this.desiredDepth / this.maxDepth;
+        // Adjust ballast percentage based on desired depth
+        const targetPercentage = Math.min(1, this.desiredDepth / this.maxDepth);
 
-        if (this.position.y > -this.desiredDepth) {
-            if (this.ballastPercentage < targetPercentage) {
-                this.ballastStatus = "filling";
-                this.ballastPercentage = Math.min(this.ballastPercentage + 0.01, targetPercentage); // Simulate filling
-            } else {
-                this.ballastStatus = "filled with " + Math.round(this.ballastPercentage * 100) + "%";
-            }
-        } else if (this.position.y < -this.desiredDepth) {
-            if (this.ballastPercentage > targetPercentage) {
-                this.ballastStatus = "emptying";
-                this.ballastPercentage = Math.max(this.ballastPercentage - 0.01, targetPercentage); // Simulate emptying
-            } else {
-                this.ballastStatus = "filled with " + Math.round(this.ballastPercentage * 100) + "%";
-            }
-        } else {
-            this.ballastStatus = "filled with " + Math.round(this.ballastPercentage * 100) + "%";
+        if (this.currentDepth < this.desiredDepth) {
+            // Filling ballast tanks
+            this.ballastPercentage = Math.min(this.ballastPercentage + 0.01, targetPercentage);
+        } else if (this.currentDepth > this.desiredDepth) {
+            // Emptying ballast tanks
+            this.ballastPercentage = Math.max(this.ballastPercentage - 0.01, targetPercentage);
         }
     }
+
     totalForce() {
-        let tf = new Vector3();
-        tf = tf.addVector(this.gravityForce());
-        tf = tf.addVector(this.buoyancyForce());
-        tf = tf.addVector(this.dragForce());
-        tf = tf.addVector(this.thrustForce());
-        return tf;
+        // Calculate total forces: gravity + buoyancy + drag + thrust
+        let totalForce = new Vector3();
+        totalForce = totalForce.addVector(this.gravityForce());
+        totalForce = totalForce.addVector(this.buoyancyForce());
+        totalForce = totalForce.addVector(this.dragForce());
+        totalForce = totalForce.addVector(this.thrustForce());
+        return totalForce;
     }
 
     gravityForce() {
-        // Gravity force
+        // Calculate gravitational force
         return new Vector3(0, -9.81 * this.mass, 0);
     }
 
     buoyancyForce() {
-        // Adjust the buoyancy force based on the ballast percentage
+        // Adjust buoyancy force based on ballast percentage
         const effectiveVolume = this.volume * (1 - this.ballastPercentage);
         return new Vector3(0, 9.81 * effectiveVolume * this.density, 0);
     }
@@ -205,11 +192,6 @@ class Submarine {
     calculatePressure() {
         // Calculate the pressure at the current depth
         return this.density * 9.81 * this.currentDepth;
-    }
-
-
-    setMass(newMass) {
-        this.mass = newMass;
     }
 }
 

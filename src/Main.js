@@ -10,7 +10,6 @@ import { EventHandlers } from './EventHandlers.js';
 import { GUIControls } from './GUI.js';
 import { MODELS } from './Constants.js';
 import Submarine from './Submarine'; // Import the Submarine class
-var submarine = new Submarine();
 
 export class Main {
     constructor() {
@@ -24,7 +23,7 @@ export class Main {
         this.eventHandlers = null;
         // this.clouds = new Clouds(this.scene);
         this.islands = []; // Array to hold island models
-        this.submarine = submarine; // Use the global submarine instance
+        this.submarine = new Submarine(); // Create the submarine instance
     }
 
     async init() {
@@ -53,8 +52,11 @@ export class Main {
             this.islands
         );
 
-        // Initialize GUI controls
-        new GUIControls(this.waterAndSky.water, this.waterAndSky.sky, this.waterAndSky.updateSun.bind(this.waterAndSky), this.submarine);
+        // Initialize GUI controls and pass it to the submarine
+        const guiControls = new GUIControls(this.waterAndSky.water, this.waterAndSky.sky, this.waterAndSky.updateSun.bind(this.waterAndSky), this.submarine);
+
+        // Set the GUIControls instance in the Submarine class
+        this.submarine.setGUIControls(guiControls);
 
         this.animate();
     }
@@ -72,15 +74,15 @@ export class Main {
 
         // Update submarine model position
         if (this.submarineModel) {
-            /////////////// dont't delete me ....
+            /////////////// don't delete me ....
             // this.submarine.position.set(
             //     this.submarineModel.position.x,
             //     this.submarineModel.position.y,
             //     this.submarineModel.position.z
             // );
-            this.submarineModel.position.x = submarine.position.x;
-            this.submarineModel.position.y = submarine.position.y; // The underwater adjustment
-            this.submarineModel.position.z = submarine.position.z;
+            this.submarineModel.position.x = this.submarine.position.x;
+            this.submarineModel.position.y = this.submarine.position.y - 4; // The underwater adjustment
+            this.submarineModel.position.z = this.submarine.position.z;
             console.log("position submarine", this.submarineModel.position);
         }
 
