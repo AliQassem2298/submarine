@@ -25,12 +25,18 @@ class Submarine {
         this.currentDepth = 0; // Current depth of the submarine
         this.timeStep = 1; // Time step in seconds for each update
         this.guiControls = null;  // Placeholder for the GUIControls instance
-
+        this.accelerationRate = 0.1; // Slower acceleration rate for gradual speed changes (in m/s²)
+        this.logTimer = 0; // Timer to control logging frequency
     }
+
     setGUIControls(guiControls) {
         this.guiControls = guiControls;
     }
+
     update() {
+        // Gradually adjust the submarine's speed towards the desired speed
+        this.adjustSpeed();
+
         // Update ballast tank status based on desired depth
         this.updateBallastTank();
 
@@ -40,7 +46,7 @@ class Submarine {
         // Update acceleration (Newton's 2nd Law: F = ma)
         this.acceleration = totalForce.divideScalar(this.mass);
 
-        // Update velocity based on acceleration
+        // Ensure that acceleration is correctly applied based on direction
         this.velocity = this.velocity.addVector(this.acceleration.clone().multiplyScalar(this.timeStep));
 
         // Apply realistic ascent/descent rates
@@ -59,11 +65,57 @@ class Submarine {
         const pressure = this.calculatePressure();
         console.log(`Pressure at depth ${this.currentDepth}: ${pressure} Pa`);
         console.log(`Ballast Percentage: ${this.ballastPercentage * 100} %`);
+
+        // Log important values once every second
+        this.logTimer += this.timeStep;
+        if (this.logTimer >= 1) {
+            this.logImportantValues(totalForce);
+            this.logTimer = 0; // Reset the timer after logging
+        }
+
         // Call updateOverlay from the GUIControls instance
         if (this.guiControls) {
             this.guiControls.updateOverlay();
         }
+    }
 
+    adjustSpeed() {
+        // Gradually adjust the speed towards the desired speed in meters per second
+        const currentSpeed = this.velocity.z;
+
+        if (this.desiredSpeed !== null) {
+            const speedDifference = this.desiredSpeed - currentSpeed;
+
+            if (Math.abs(speedDifference) > this.accelerationRate) {
+                const adjustment = Math.sign(speedDifference) * this.accelerationRate * this.timeStep;
+                this.velocity.z += adjustment;
+            } else {
+                this.velocity.z = this.desiredSpeed;
+            }
+        } else {
+            // If no desired speed is set, gradually bring the submarine to a halt
+            if (currentSpeed > 0) {
+                this.velocity.z = Math.max(0, currentSpeed - this.accelerationRate * this.timeStep);
+            } else if (currentSpeed < 0) {
+                this.velocity.z = Math.min(0, currentSpeed + this.accelerationRate * this.timeStep);
+            }
+        }
+    }
+
+    logImportantValues(totalForce) {
+        const thrustForce = this.thrustForce();
+        const dragForce = this.dragForce();
+        let powerOutput = this.velocity.z * thrustForce.length() / this.propellerEfficiency;
+
+        // Ensure power output is always positive
+        powerOutput = Math.abs(powerOutput);
+
+        console.log(`Current Velocity: ${this.velocity.length()} m/s`);
+        console.log(`Current Acceleration: ${this.acceleration.length()} m/s²`);
+        console.log(`Thrust Force: ${thrustForce.length()} N`);
+        console.log(`Drag Force: ${dragForce.length()} N`);
+        console.log(`Power Output: ${powerOutput} W`);
+        console.log(`Power Output: ${powerOutput * 0.00134} HorsePower`);
     }
 
     applyAscentDescentRates() {
@@ -172,21 +224,16 @@ class Submarine {
         // Calculate the thrust required to achieve the desired speed
         const vDirection = new Vector3(0, 0, desiredSpeed >= 0 ? 1 : -1);
         const desiredSpeedMagnitude = Math.abs(desiredSpeed);
-        const dragAtDesiredSpeed = 0.5 * this.density * Math.pow(desiredSpeedMagnitude, 2) * this.lowerArea * this.CdWater;
-        return vDirection.multiplyScalar(dragAtDesiredSpeed);
+        const dragAtDesiredSpeed = 0.5 * this.density * Math.pow(desiredSpeedMagnitude, 2) * this.area * this.CdWater;
+        const requiredThrust = dragAtDesiredSpeed / this.propellerEfficiency;
+        return vDirection.multiplyScalar(requiredThrust);
     }
 
     calculateThrustForce(desiredThrust) {
-        // Calculate the thrust force based on the desired thrust
-        const vDirection = new Vector3(0, 0, desiredThrust >= 0 ? 1 : -1);
-        return vDirection.multiplyScalar(Math.abs(desiredThrust));
-    }
-
-    calculatePowerOutput() {
-        // Calculate the power output required for the current velocity
-        const thrustForce = this.thrustForce().length();
-        const velocity = this.velocity.length();
-        return (thrustForce * velocity) / this.propellerEfficiency;
+        // Calculate the actual thrust force based on desired thrust
+        const vDirection = new Vector3(0, 0, 1);
+        const thrustForce = desiredThrust * this.propellerEfficiency;
+        return vDirection.multiplyScalar(thrustForce);
     }
 
     calculatePressure() {
