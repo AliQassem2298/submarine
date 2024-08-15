@@ -119,7 +119,7 @@ export class Main {
         this.renderer = new Renderer().renderer;
         this.scene = new Scene().scene;
         this.cameraAndLighting = new CameraAndLighting();
-        this.waterAndSky = new WaterAndSky(this.scene, this.renderer);
+        this.waterAndSky = new WaterAndSky(this.scene, this.renderer, this.cameraAndLighting.defaultCamera);
         this.controls = new Controls(this.cameraAndLighting.defaultCamera, this.renderer);
         this.modelLoader = new ModelLoader(this.scene);
         this.lighting = new Lighting(this.scene);
@@ -170,12 +170,31 @@ export class Main {
         this.animate();
     }
 
+
+    // initUnderwaterScene() {
+    //     const textureLoader = new THREE.TextureLoader();
+    //     const skyboxTexture = textureLoader.load('/models/textures/img.jpg');
+    //     const sphereGeometry = new THREE.SphereGeometry(1000, 60, 40, 0, Math.PI * 2, Math.PI / 2, Math.PI);  // Creates the bottom half
+    //     const sphereMaterial = new THREE.MeshBasicMaterial({
+    //         map: skyboxTexture,
+    //         side: THREE.BackSide,
+    //     });
+    //     const skybox = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    //     this.scene.add(skybox);
+
+    //     // Load and animate fishes
+    //     this.loadFishes();
+
+    //     // Load and animate jellyfishes
+    //     this.loadJellyfishes();
+
+    //     // Load and animate sharks
+    //     this.loadSharks();
+    // }
     initUnderwaterScene() {
-        const textureLoader = new THREE.TextureLoader();
-        const skyboxTexture = textureLoader.load('/models/textures/img.jpg');
-        const sphereGeometry = new THREE.SphereGeometry(1000, 60, 40);
+        const sphereGeometry = new THREE.SphereGeometry(1000, 60, 40, 0, Math.PI * 2, Math.PI / 2, Math.PI);  // Creates the bottom half
         const sphereMaterial = new THREE.MeshBasicMaterial({
-            map: skyboxTexture,
+            color: 0x44B0BC, // Set your desired color here
             side: THREE.BackSide,
         });
         const skybox = new THREE.Mesh(sphereGeometry, sphereMaterial);
@@ -193,12 +212,13 @@ export class Main {
 
 
 
+
     loadFishes() {
         // Assuming water level is at y = 0
         const waterLevel = -50;
         const fishLoader = new GLTFLoader();
         const fishBoundary = 300;
-        const numFishes = 50;
+        const numFishes = 20;
 
         for (let i = 0; i < numFishes; i++) {
             fishLoader.load('/models/fish/scene.gltf', (gltf) => {
@@ -232,7 +252,7 @@ export class Main {
         const waterLevel = -50;
         const jellyfishLoader = new GLTFLoader();
         const jellyfishBoundary = 300;
-        const numJellyfishes = 50;
+        const numJellyfishes = 20;
 
         for (let i = 0; i < numJellyfishes; i++) {
             jellyfishLoader.load('/models/jellyfish/scene.gltf', (gltf) => {
@@ -271,7 +291,7 @@ export class Main {
         for (let i = 0; i < 2; i++) {
             sharkLoader.load('/models/shark/scene.gltf', (gltf) => {
                 const shark = gltf.scene;
-                shark.scale.set(0.1, 0.1, 0.1);
+                shark.scale.set(0.01, 0.01, 0.01);
 
                 // Position the shark below the water surface
                 shark.position.set(
@@ -321,9 +341,12 @@ export class Main {
             );
         }
 
+        // Render the scene
         this.waterAndSky.water.material.uniforms['time'].value += 1.0 / 60.0;
         this.renderer.render(this.scene, this.cameraAndLighting.currentCamera);
     }
+
+
 
     animateFishes() {
         const now = Date.now();
@@ -370,6 +393,7 @@ export class Main {
         });
     }
 }
+
 
 const main = new Main();
 main.init();

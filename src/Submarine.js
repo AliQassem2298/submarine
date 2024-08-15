@@ -63,8 +63,8 @@ class Submarine {
 
         // Calculate pressure at current depth
         const pressure = this.calculatePressure();
-        console.log(`Pressure at depth ${this.currentDepth}: ${pressure} Pa`);
-        console.log(`Ballast Percentage: ${this.ballastPercentage * 100} %`);
+        // console.log(`Pressure at depth ${this.currentDepth}: ${pressure} Pa`);
+        // console.log(`Ballast Percentage: ${this.ballastPercentage * 100} %`);
 
         // Log important values once every second
         this.logTimer += this.timeStep;
@@ -110,12 +110,12 @@ class Submarine {
         // Ensure power output is always positive
         powerOutput = Math.abs(powerOutput);
 
-        console.log(`Current Velocity: ${this.velocity.length()} m/s`);
-        console.log(`Current Acceleration: ${this.acceleration.length()} m/s²`);
-        console.log(`Thrust Force: ${thrustForce.length()} N`);
-        console.log(`Drag Force: ${dragForce.length()} N`);
-        console.log(`Power Output: ${powerOutput} W`);
-        console.log(`Power Output: ${powerOutput * 0.00134} HorsePower`);
+        // console.log(`Current Velocity: ${this.velocity.length()} m/s`);
+        // console.log(`Current Acceleration: ${this.acceleration.length()} m/s²`);
+        // console.log(`Thrust Force: ${thrustForce.length()} N`);
+        // console.log(`Drag Force: ${dragForce.length()} N`);
+        // console.log(`Power Output: ${powerOutput} W`);
+        // console.log(`Power Output: ${powerOutput * 0.00134} HorsePower`);
     }
 
     applyAscentDescentRates() {

@@ -5,9 +5,10 @@ import { Water } from 'three/examples/jsm/objects/Water.js';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 
 export class WaterAndSky {
-    constructor(scene, renderer) {
+    constructor(scene, renderer, camera) {
         this.scene = scene;
         this.renderer = renderer;
+        this.camera = camera;
         this.sun = new THREE.Vector3();
         this.parameters = {
             elevation: 2,
@@ -15,6 +16,9 @@ export class WaterAndSky {
         };
         this.setupWater();
         this.setupSky();
+
+        // Create an underwater layer
+        this.createUnderwaterLayer();
     }
 
     setupWater() {
@@ -54,6 +58,19 @@ export class WaterAndSky {
         this.pmremGenerator = new THREE.PMREMGenerator(this.renderer);
 
         this.updateSun();
+    }
+
+    createUnderwaterLayer() {
+        const underwaterGeometry = new THREE.PlaneGeometry(WATER_GEOMETRY_SIZE, WATER_GEOMETRY_SIZE);
+        const underwaterMaterial = new THREE.MeshBasicMaterial({
+            color: 0x44B0BC, // Lighter blue color
+            side: THREE.DoubleSide,
+        });
+
+        this.underwaterLayer = new THREE.Mesh(underwaterGeometry, underwaterMaterial);
+        this.underwaterLayer.rotation.x = -Math.PI / 2;
+        this.underwaterLayer.position.y = -2; // Position it slightly below the water surface
+        this.scene.add(this.underwaterLayer);
     }
 
     updateSun(elevation = this.parameters.elevation, azimuth = this.parameters.azimuth) {
