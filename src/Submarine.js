@@ -14,7 +14,7 @@ class Submarine {
         this.CdWater = 0.025; // Drag coefficient for water
         this.area = 121.35; // Total reference area in square meters
         this.upperArea = 25; // Upper part reference area in square meters
-        this.lowerArea = 96.35; // Lower part reference area in square meters
+        this.lowerArea = 96.35; // Lowxer part reference area in square meters
         this.maxEnginePower = 29828000; // Max power output in watts (40,000 shp)
         this.propellerEfficiency = 0.7; // Propeller efficiency (dimensionless)
         this.desiredSpeed = null; // Desired speed set by the captain
@@ -25,7 +25,7 @@ class Submarine {
         this.currentDepth = 0; // Current depth of the submarine
         this.timeStep = 1; // Time step in seconds for each update
         this.guiControls = null;  // Placeholder for the GUIControls instance
-        this.accelerationRate = 0.1; // Slower acceleration rate for gradual speed changes (in m/s²)
+        this.accelerationRate = 0.01; // Slower acceleration rate for gradual speed changes (in m/s²)
         this.logTimer = 0; // Timer to control logging frequency
     }
 
@@ -109,13 +109,6 @@ class Submarine {
 
         // Ensure power output is always positive
         powerOutput = Math.abs(powerOutput);
-
-        // console.log(`Current Velocity: ${this.velocity.length()} m/s`);
-        // console.log(`Current Acceleration: ${this.acceleration.length()} m/s²`);
-        // console.log(`Thrust Force: ${thrustForce.length()} N`);
-        // console.log(`Drag Force: ${dragForce.length()} N`);
-        // console.log(`Power Output: ${powerOutput} W`);
-        // console.log(`Power Output: ${powerOutput * 0.00134} HorsePower`);
     }
 
     applyAscentDescentRates() {
@@ -124,10 +117,10 @@ class Submarine {
 
         if (depthDifference > 0) {
             // Descending
-            this.velocity.y = -Math.min(0.5, depthDifference / this.timeStep);
+            this.velocity.y = -Math.min(0.1, depthDifference / this.timeStep);
         } else if (depthDifference < 0) {
             // Ascending
-            this.velocity.y = Math.min(0.2, Math.abs(depthDifference) / this.timeStep);
+            this.velocity.y = Math.min(0.1, Math.abs(depthDifference) / this.timeStep);
         } else {
             // Stop vertical movement if at desired depth
             this.velocity.y = 0;

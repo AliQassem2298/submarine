@@ -11,7 +11,7 @@ export class CameraAndLighting {
         this.thirdPersonCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight);
         this.thirdPersonCamera.position.set(0, 10, -30); // Initial third-person camera position
 
-        this.currentCamera = this.defaultCamera; // Set default camera
+        this.currentCamera = this.thirdPersonCamera; // Set default camera
         this.setupLighting();
     }
 

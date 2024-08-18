@@ -15,7 +15,7 @@ export class GUIControls {
             elevation: 2,
             azimuth: 180,
             distortionScale: this.water.material.uniforms.distortionScale.value,
-            size: this.water.material.uniforms.size.value,
+            size: 5,  // Set the default water size to 5
             desiredSpeed: this.submarine.desiredSpeed || 0, // Initialize with the submarine's current desiredSpeed
             desiredDepth: this.submarine.desiredDepth || 0 // Initialize with the submarine's current desiredDepth
         };
@@ -36,8 +36,11 @@ export class GUIControls {
         const waterUniforms = this.water.material.uniforms;
         const folderWater = gui.addFolder('Water');
         folderWater.add(waterUniforms.distortionScale, 'value', 0, 8, 0.1).name('distortionScale');
-        folderWater.add(waterUniforms.size, 'value', 0.1, 10, 0.1).name('size');
+        folderWater.add(parameters, 'size', 0.1, 10, 0.1).name('size').onChange((value) => {
+            waterUniforms.size.value = value;  // Update the water size uniform when the GUI value changes
+        });
         folderWater.open();
+
 
         // Submarine folder
         const folderSubmarine = gui.addFolder('Submarine');
@@ -101,11 +104,11 @@ export class GUIControls {
 
     updateOverlay() {
         const velocity = this.submarine.velocity.length().toFixed(2);
-        const acceleration = this.submarine.acceleration.length().toFixed(2);
+        const acceleration = this.submarine.acceleration.length().toFixed(5);
         const thrustForce = this.submarine.thrustForce().length().toFixed(2);
         const dragForce = this.submarine.dragForce().length().toFixed(2);
-        const powerOutput = (this.submarine.velocity.z * thrustForce / this.submarine.propellerEfficiency).toFixed(2);
-        const powerOutputHP = (powerOutput * 0.00134).toFixed(2);
+        const powerOutput = Math.abs((this.submarine.velocity.z * thrustForce / this.submarine.propellerEfficiency).toFixed(2));
+        const powerOutputHP = Math.abs((powerOutput * 0.00134).toFixed(2));
         const gravityForce = this.submarine.gravityForce().length().toFixed(2);
         const buoyancyForce = this.submarine.buoyancyForce().length().toFixed(2);
 

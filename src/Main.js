@@ -337,7 +337,8 @@ export class Main {
             this.submarineModel.position.set(
                 this.submarine.position.x,
                 this.submarine.position.y - 4,
-                this.submarine.position.z
+                this.submarine.position.z + 2000
+
             );
         }
 
